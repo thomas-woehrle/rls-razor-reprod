@@ -6,7 +6,7 @@ wandb:
   # W&B entity that owns the project. WANDB_ENTITY overrides this.
   entity: thomas-woehrle-team
   # Project that holds every orch run. WANDB_PROJECT overrides this.
-  project: orch-exp
+  project: rls_razor_reprod
 
 # Cluster used when --cluster is omitted.
 default_cluster: eddie

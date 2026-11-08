@@ -1,10 +1,15 @@
-# GRPO learning-rate sweep, Qwen2.5-1.5B-Instruct. Four of the paper's five
-# values. Run on eddie: orch run experiments/tooluse_grpo_lr.yaml --cluster eddie
+# GRPO learning-rate sweep, Qwen2.5-1.5B-Instruct, plus the base-model evals
+# that anchor the frontier. Four of the paper's five values. Held evals inherit
+# each run's tags. The base evals also appear in tooluse_sft_lr.yaml; whichever
+# file runs first submits them and the other skips them.
+# Run on eddie: orch run experiments/tooluse_grpo_lr.yaml --cluster eddie
 version: 1
-description: GRPO tool-use learning-rate sweep, 1.5B.
+description: GRPO tool-use learning-rate sweep and base evals, 1.5B.
 runs:
-  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 1.0e-5 } }
-  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 2.0e-5 } }
-  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 3.0e-5 } }
-  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 5.0e-5 } }
+  - { config: configs/eval/tooluse.yaml, model: "hf:Qwen/Qwen2.5-1.5B-Instruct", tags: ["method:base"] }
+  - { config: configs/eval/prior_tasks.yaml, model: "hf:Qwen/Qwen2.5-1.5B-Instruct", tags: ["method:base"] }
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 1.0e-5 }, tags: ["method:grpo"] }
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 2.0e-5 }, tags: ["method:grpo"] }
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 3.0e-5 }, tags: ["method:grpo"] }
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 5.0e-5 }, tags: ["method:grpo"] }
 tags: ["exp:rlsrazor-tooluse-lr"]

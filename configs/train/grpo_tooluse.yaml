@@ -1,9 +1,9 @@
-# GRPO on the tool-use task, paper configuration. One A100 with vLLM colocated.
+# GRPO on the tool-use task, paper configuration. One GPU with vLLM colocated.
 kind: train
 entry: train
 description: GRPO on the tool-use task, paper configuration.
 params: hparams/grpo_tooluse.yaml
-resources: {gpus: 1, gpu_type: a100, time: "24:00:00", mem: 64G}
+resources: {gpus: 1, time: "24:00:00", mem: 64G}
 evals:
   - configs/eval/tooluse.yaml
   - configs/eval/prior_tasks.yaml
