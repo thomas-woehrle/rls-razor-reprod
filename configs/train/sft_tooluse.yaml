@@ -1,0 +1,10 @@
+# SFT on the tool-use task, paper configuration.
+kind: train
+entry: train
+description: SFT on the tool-use task, paper configuration.
+params: hparams/sft_tooluse.yaml
+resources: {gpus: 1, time: "12:00:00", mem: 32G}
+evals:
+  - configs/eval/tooluse.yaml
+  - configs/eval/prior_tasks.yaml
+name_keys: {model: params.model_name, lr: params.learning_rate}

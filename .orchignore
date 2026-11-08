@@ -1,0 +1,10 @@
+# Paths the cluster worktree does not need. A dirty path is allowed only if
+# it matches here, because the worktree excludes the same patterns.
+docs/
+tests/
+figures/
+evals/
+models/
+wandb/
+output/
+*.ipynb

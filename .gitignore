@@ -1,0 +1,25 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Other
+wandb/
+results/
+data/**/cache-*
+output/*
+
+models/
+evals/
+figures/
+
+# Operator config and cluster checkouts
+orch.local.yaml
+.worktrees/
+.orch-staging.lock
