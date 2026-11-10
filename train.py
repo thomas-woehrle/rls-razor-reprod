@@ -20,8 +20,18 @@ from rls_razor.tooluse import format_for_grpo, format_for_sft, tooluse_reward
 POPPED = ("method", "model_name", "dtype", "train_data")
 
 
+def _cap_logprob_chunks(trainer, chunk_size: int) -> None:
+    original = trainer._get_per_token_logps_and_entropies
+
+    def chunked(model, input_ids, attention_mask, logits_to_keep, batch_size=None, **kwargs):
+        del batch_size
+        return original(model, input_ids, attention_mask, logits_to_keep, chunk_size, **kwargs)
+
+    trainer._get_per_token_logps_and_entropies = chunked
+
+
 def build_config(params: dict, run_dir: str):
-    """Return ``(method, model_name, train_data, training_args)``."""
+    """Return ``(method, model_name, train_data, training_args, logprob_chunk)``."""
     cfg = dict(params)
     missing = [key for key in (*POPPED, "seed") if key not in cfg]
     if missing:
@@ -30,6 +40,11 @@ def build_config(params: dict, run_dir: str):
     model_name = cfg.pop("model_name")
     dtype = cfg.pop("dtype")
     train_data = cfg.pop("train_data")
+    logprob_chunk = cfg.pop("logprob_chunk", None)
+    if logprob_chunk is not None and (
+        isinstance(logprob_chunk, bool) or not isinstance(logprob_chunk, int) or logprob_chunk < 1
+    ):
+        raise SystemExit(f"logprob_chunk must be a positive integer or null, got {logprob_chunk!r}")
     common = {
         "output_dir": os.path.join(run_dir, "checkpoints"),
         "report_to": "wandb",
@@ -47,7 +62,7 @@ def build_config(params: dict, run_dir: str):
         training_args = SFTConfig(**cfg, **common)
     else:
         raise SystemExit(f"unknown method {method!r}")
-    return method, model_name, train_data, training_args
+    return method, model_name, train_data, training_args, logprob_chunk
 
 
 def main() -> None:
@@ -64,7 +79,7 @@ def main() -> None:
     if not run_dir or not model_dir:
         raise SystemExit("ORCH_RUN_DIR and ORCH_MODEL_DIR must be set")
 
-    method, model_name, train_data, training_args = build_config(loaded, run_dir)
+    method, model_name, train_data, training_args, logprob_chunk = build_config(loaded, run_dir)
     raw_dataset = load_from_disk(train_data)
     if not isinstance(raw_dataset, Dataset):
         raise SystemExit(f"{train_data} is not a datasets.Dataset")
@@ -82,6 +97,8 @@ def main() -> None:
             train_dataset=train_dataset,
             processing_class=tokenizer,
         )
+        if logprob_chunk is not None:
+            _cap_logprob_chunks(trainer, logprob_chunk)
     else:
         from trl import SFTTrainer
 
