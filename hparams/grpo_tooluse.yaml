@@ -11,6 +11,7 @@ runtime_keys:
   - vllm_gpu_memory_utilization
   - vllm_enable_sleep_mode
   - vllm_max_model_length
+  - use_liger_kernel
   - gradient_checkpointing
   - logging_steps
 
@@ -43,5 +44,6 @@ vllm_gpu_memory_utilization: 0.3
 vllm_enable_sleep_mode: true
 # Longest prompt is ~1.5k tokens, plus max_completion_length.
 vllm_max_model_length: 3072
+use_liger_kernel: true
 gradient_checkpointing: true
 logging_steps: 1
