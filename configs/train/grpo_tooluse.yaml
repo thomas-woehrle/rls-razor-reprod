@@ -3,8 +3,8 @@ kind: train
 entry: train
 description: GRPO on the tool-use task, paper configuration.
 params: hparams/grpo_tooluse.yaml
-resources: {gpus: 1, time: "24:00:00", mem: 64G}
+resources: { gpus: 1, time: "48:00:00", mem: 64G }
 evals:
   - configs/eval/tooluse.yaml
   - configs/eval/prior_tasks.yaml
-name_keys: {model: params.model_name, lr: params.learning_rate}
+name_keys: { model: params.model_name, lr: params.learning_rate }

@@ -1,0 +1,15 @@
+# GRPO learning-rate sweep with a smaller group, Qwen2.5-1.5B-Instruct. Group
+# size is 16 instead of 64, and gradient_accumulation_steps drops from 64 to 16
+# so a step still uses 8 prompts (8 * 16 = 128 completions = 8 prompts * 16).
+# That keeps the ~505 optimizer steps and the 50 warmup steps, at about a
+# quarter of the compute per step. This deviates from the paper's group size
+# and batch of 512 completions. Base-model evals are in tooluse_grpo_lr.yaml.
+# Run on eddie: orch run experiments/tooluse_grpo_lr_g16.yaml --cluster eddie
+version: 1
+description: GRPO tool-use learning-rate sweep with group size 16, 1.5B.
+runs:
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 1.0e-5, params.num_generations: 16, params.gradient_accumulation_steps: 16 }, tags: ["method:grpo", "group:16"] }
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 2.0e-5, params.num_generations: 16, params.gradient_accumulation_steps: 16 }, tags: ["method:grpo", "group:16"] }
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 3.0e-5, params.num_generations: 16, params.gradient_accumulation_steps: 16 }, tags: ["method:grpo", "group:16"] }
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 5.0e-5, params.num_generations: 16, params.gradient_accumulation_steps: 16 }, tags: ["method:grpo", "group:16"] }
+tags: ["exp:rlsrazor-tooluse-lr-g16"]
