@@ -9,4 +9,4 @@ params:
   tasks: hellaswag,mmlu,truthfulqa,winogrande,humaneval,ifeval
   batch_size: auto
   apply_chat_template: false
-resources: {gpus: 1, time: "06:00:00", mem: 32G}
+resources: { gpus: 1, time: "06:00:00", mem: 24G }
