@@ -9,6 +9,7 @@ checkpoint selection, matching the paper's sweep-then-evaluate protocol.
 from __future__ import annotations
 
 import os
+import socket
 from pathlib import Path
 
 from datasets import Dataset, load_from_disk
@@ -18,6 +19,37 @@ from orch.yamlio import load_path
 from rls_razor.tooluse import format_for_grpo, format_for_sft, tooluse_reward
 
 POPPED = ("method", "model_name", "dtype", "train_data")
+
+
+def _port_is_free(port: int) -> bool:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        try:
+            sock.bind(("127.0.0.1", port))
+        except OSError:
+            return False
+    return True
+
+
+def _isolate_master_port() -> None:
+    """Give this job its own torch rendezvous port.
+
+    Colocated vLLM initializes distributed with ``env://``. TRL picks
+    ``MASTER_PORT`` from a fixed list starting at 29500, and only checks that
+    the port looks free before another job binds it. Jobs that start together
+    on one machine therefore all take the same port, and the later ones fail
+    with "address already in use". A single-process job does not share a
+    rendezvous with anyone, so a port derived from this process is enough.
+    """
+    world = os.environ.get("WORLD_SIZE", "1").strip()
+    if world not in {"", "1"}:
+        return
+    start = 20000 + (os.getpid() % 20000)
+    for port in range(start, start + 32):
+        if _port_is_free(port):
+            os.environ.setdefault("MASTER_ADDR", "127.0.0.1")
+            os.environ["MASTER_PORT"] = str(port)
+            return
+    raise SystemExit(f"no free MASTER_PORT near {start}")
 
 
 def _cap_logprob_chunks(trainer, chunk_size: int) -> None:
@@ -90,6 +122,7 @@ def main() -> None:
     if method == "grpo":
         from trl import GRPOTrainer
 
+        _isolate_master_port()
         trainer = GRPOTrainer(
             model=model_name,
             reward_funcs=tooluse_reward,
