@@ -1,5 +1,6 @@
 # GRPO learning-rate sweep, Qwen2.5-3B-Instruct. Group size stays 64.
-# Learning rates are the paper's five values; the 1.5B file dropped 4e-5.
+# The paper's five values, plus the extra ablation rates from the 1.5B file
+# (3e-6, 5e-6, 7e-6, 9e-6). The 1.5B file dropped 4e-5.
 # num_iterations stays 1. Table 2 also sweeps it over {1, 2}. μ=2 doubles the
 # optimizer steps, and on an L40S that is about 60h, past the 48h limit.
 # Run on eddie: orch run experiments/tooluse_grpo_lr_3b.yaml --cluster eddie
@@ -11,4 +12,8 @@ runs:
   - { config: configs/train/grpo_tooluse.yaml, set: { params.model_name: "Qwen/Qwen2.5-3B-Instruct", params.learning_rate: 3.0e-5 }, tags: ["method:grpo"] }
   - { config: configs/train/grpo_tooluse.yaml, set: { params.model_name: "Qwen/Qwen2.5-3B-Instruct", params.learning_rate: 4.0e-5 }, tags: ["method:grpo"] }
   - { config: configs/train/grpo_tooluse.yaml, set: { params.model_name: "Qwen/Qwen2.5-3B-Instruct", params.learning_rate: 5.0e-5 }, tags: ["method:grpo"] }
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.model_name: "Qwen/Qwen2.5-3B-Instruct", params.learning_rate: 3.0e-6 }, tags: ["method:grpo"] }
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.model_name: "Qwen/Qwen2.5-3B-Instruct", params.learning_rate: 5.0e-6 }, tags: ["method:grpo"] }
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.model_name: "Qwen/Qwen2.5-3B-Instruct", params.learning_rate: 7.0e-6 }, tags: ["method:grpo"] }
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.model_name: "Qwen/Qwen2.5-3B-Instruct", params.learning_rate: 9.0e-6 }, tags: ["method:grpo"] }
 tags: ["exp:rlsrazor-tooluse-grpo-3b"]
