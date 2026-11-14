@@ -1,0 +1,17 @@
+# GRPO learning-rate sweep, Qwen2.5-1.5B-Instruct, group 16, num_iterations 2.
+# Same setup as tooluse_grpo_lr_g16.yaml, limited to learning rates below
+# 2e-5: 3e-6, 5e-6, 7e-6, 9e-6, 1e-5. Group size is 16, and
+# gradient_accumulation_steps is 16, so a step still uses 8 prompts.
+# num_iterations 2 reuses each generation batch for a second optimizer step,
+# so a run takes about twice as many optimizer steps as the matching
+# num_iterations 1 run.
+# Run on eddie: orch run experiments/tooluse_grpo_lr_g16_2iters.yaml --cluster eddie
+version: 1
+description: GRPO tool-use learning-rate sweep, 1.5B, group 16, num_iterations 2.
+runs:
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 3.0e-6, params.num_generations: 16, params.gradient_accumulation_steps: 16, params.num_iterations: 2 }, tags: ["method:grpo", "group:16"] }
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 5.0e-6, params.num_generations: 16, params.gradient_accumulation_steps: 16, params.num_iterations: 2 }, tags: ["method:grpo", "group:16"] }
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 7.0e-6, params.num_generations: 16, params.gradient_accumulation_steps: 16, params.num_iterations: 2 }, tags: ["method:grpo", "group:16"] }
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 9.0e-6, params.num_generations: 16, params.gradient_accumulation_steps: 16, params.num_iterations: 2 }, tags: ["method:grpo", "group:16"] }
+  - { config: configs/train/grpo_tooluse.yaml, set: { params.learning_rate: 1.0e-5, params.num_generations: 16, params.gradient_accumulation_steps: 16, params.num_iterations: 2 }, tags: ["method:grpo", "group:16"] }
+tags: ["exp:rlsrazor-tooluse-lr-g16-2iters"]
